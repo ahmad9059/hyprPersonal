@@ -133,7 +133,7 @@ echo "${NOTE} Applying personal local modifications...${RESET}"
 USERS_CONF="$HOME/.config/hypr/UserConfigs/UserSettings.conf"
 if [ -f "$USERS_CONF" ]; then
   echo "${ACTION} Updating kb_options in UserSettings.conf..."
-  if sed -i 's/kb_options = $/kb_options = ctrl:nocaps/' "$USERS_CONF"; then
+  if sed -i 's/kb_options = *$/kb_options = ctrl:nocaps/' "$USERS_CONF"; then
     echo "${OK} kb_options updated in UserSettings.conf"
   else
     echo "${ERROR} Failed to update UserSettings.conf"
@@ -242,32 +242,6 @@ fi
 # =========================
 # Git user configuration
 # =========================
-GIT_NAME="ahmad9059"
-GIT_EMAIL="ahmadhassan9059@gmail.com"
-GIT_EDITOR="vim" # or vim, code, etc.
-
-echo "[ACTION] Setting up Git global config..."
-git config --global user.name "$GIT_NAME"
-git config --global user.email "$GIT_EMAIL"
-git config --global core.editor "$GIT_EDITOR"
-echo "[OK] Git global config set"
-
-# =========================
-# GitHub CLI authentication
-# =========================
-GH_TOKEN="ghp_xxxxxxxxxxxxxxxxxxxxxxx" # Put your PAT here or use env variable
-
-echo "[ACTION] Authenticating GitHub CLI..."
-# Log in using token (non-interactive)
-echo "$GH_TOKEN" | gh auth login --with-token
-echo "[OK] GitHub CLI authenticated"
-
-# =========================
-# Optional: set default GitHub CLI settings
-# =========================
-gh config set git_protocol https
-gh config set editor "$GIT_EDITOR"
-echo "[OK] GitHub CLI config done"
 
 echo -e "\n\n${OK} === Personal modifications applied locally. === ${RESET}"
 
