@@ -17,6 +17,14 @@ GREEN="$(tput setaf 2)"
 BLUE="$(tput setaf 4)"
 MAGENTA="$(tput setaf 5)"
 
+# =============================
+# Paths
+# ============================
+FONT_DIR="/tmp/San-Francisco-family"
+SYSTEM_FONT_LOCATION="/usr/local/share/fonts/otf"
+FONT_URL="https://github.com/thelioncape/San-Francisco-family.git"
+FONTS=("SF Pro" "SF Serif" "SF Mono")
+
 # ===========================
 # Log Details
 # ===========================
@@ -158,6 +166,44 @@ echo -e "${ACTION} Setting ur_PK.UTF-8 locale for time...${RESET}" | tee -a "$LO
 echo -e "${OK} LC_TIME=ur_PK.UTF-8 set successfully.${RESET}" | tee -a "$LOG_FILE"
 
 # ==============================
+# Install San Francisco Fonts
+# ==============================
+echo -e "\n${ACTION} Cloning San Francisco fonts repository...${RESET}"
+if git clone -n --depth=1 --filter=tree:0 "$FONT_URL" "$FONT_DIR"; then
+  cd "$FONT_DIR" || {
+    echo -e "${ERROR} Failed to enter font repo directory.${RESET}"
+    exit 1
+  }
+  if git sparse-checkout set --no-cone "${FONTS[@]}" && git checkout; then
+    echo -e "${OK} Repository cloned and sparse checkout successful.${RESET}"
+  else
+    echo -e "${ERROR} Failed during sparse checkout.${RESET}"
+    exit 1
+  fi
+else
+  echo -e "${ERROR} Failed to clone font repository.${RESET}"
+  exit 1
+fi
+echo -e "\n${ACTION} Copying font files...${RESET}"
+sudo mkdir -p "$SYSTEM_FONT_LOCATION"/sf-{pro,serif,mono}
+sudo cp "$FONT_DIR"/SF\ Pro/*.otf "$SYSTEM_FONT_LOCATION/sf-pro" &&
+  sudo cp "$FONT_DIR"/SF\ Serif/*.otf "$SYSTEM_FONT_LOCATION/sf-serif" &&
+  sudo cp "$FONT_DIR"/SF\ Mono/*.otf "$SYSTEM_FONT_LOCATION/sf-mono"
+if [ $? -eq 0 ]; then
+  rm -rf "$FONT_DIR"
+  echo -e "${OK} Fonts installed successfully to $SYSTEM_FONT_LOCATION.${RESET}"
+else
+  echo -e "${ERROR} Failed to copy fonts.${RESET}"
+  exit 1
+fi
+echo -e "\n${NOTE} Updating font cache...${RESET}"
+if sudo fc-cache -f -v; then
+  echo -e "${OK} Font cache updated.${RESET}"
+else
+  echo -e "${WARN} Could not update font cache.${RESET}"
+fi
+
+# ==============================
 # Setup Chaotic AUR Repository
 # ==============================
 echo -e "\n${ACTION} Setting up Chaotic AUR repository...${RESET}" | tee -a "$LOG_FILE"
@@ -192,6 +238,36 @@ else
   echo -e "${ERROR} Failed to update system after adding Chaotic AUR.${RESET}" | tee -a "$LOG_FILE"
   exit 1
 fi
+
+# =========================
+# Git user configuration
+# =========================
+GIT_NAME="ahmad9059"
+GIT_EMAIL="ahmadhassan9059@gmail.com"
+GIT_EDITOR="vim" # or vim, code, etc.
+
+echo "[ACTION] Setting up Git global config..."
+git config --global user.name "$GIT_NAME"
+git config --global user.email "$GIT_EMAIL"
+git config --global core.editor "$GIT_EDITOR"
+echo "[OK] Git global config set"
+
+# =========================
+# GitHub CLI authentication
+# =========================
+GH_TOKEN="ghp_xxxxxxxxxxxxxxxxxxxxxxx" # Put your PAT here or use env variable
+
+echo "[ACTION] Authenticating GitHub CLI..."
+# Log in using token (non-interactive)
+echo "$GH_TOKEN" | gh auth login --with-token
+echo "[OK] GitHub CLI authenticated"
+
+# =========================
+# Optional: set default GitHub CLI settings
+# =========================
+gh config set git_protocol https
+gh config set editor "$GIT_EDITOR"
+echo "[OK] GitHub CLI config done"
 
 echo -e "\n\n${OK} === Personal modifications applied locally. === ${RESET}"
 
