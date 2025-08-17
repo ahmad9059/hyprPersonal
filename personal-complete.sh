@@ -133,7 +133,7 @@ fi
 # 2. Restore hyprland.conf label block (LC_TIME and font_family)
 HYPR_CONF="$HOME/dotfiles/.config/hypr/hyprlock.conf"
 if [ -f "$HYPR_CONF" ]; then
-  echo "${ACTION} Updating LC_TIME and font_family in hyprland.conf..."
+  echo "${ACTION} Updating LC_TIME and font_family in hyprlock.conf..."
   if sed -i 's/LC_TIME=en_US.UTF-8/LC_TIME=ur_PK.UTF-8/' "$HYPR_CONF" &&
     sed -i 's/SF Pro Display Semibold/Noto Nastaliq Urdu/' "$HYPR_CONF"; then
     echo "${OK} LC_TIME and font_family updated in hyprlock.conf"
