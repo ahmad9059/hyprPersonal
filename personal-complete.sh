@@ -114,7 +114,7 @@ bash dotfile_installer.sh
 echo "${OK} Dotfiles Installation Completed${RESET}"
 
 # ===========================
-# Apply personal changes (reverse from GitHub state)
+# Apply personal changes
 # ===========================
 echo "${ACTION} Applying personal local modifications...${RESET}"
 
@@ -156,7 +156,6 @@ echo -e "${ACTION} Setting ur_PK.UTF-8 locale for time...${RESET}" | tee -a "$LO
   exit 1
 }
 echo -e "${OK} LC_TIME=ur_PK.UTF-8 set successfully.${RESET}" | tee -a "$LOG_FILE"
-
 echo "${OK} Personal modifications applied locally.${RESET}"
 
 # ===========================
