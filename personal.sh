@@ -186,7 +186,7 @@ else
   echo -e "${NOTE} Chaotic AUR repository already exists in pacman.conf.${RESET}" | tee -a "$LOG_FILE"
 fi
 # Sync and update
-if sudo pacman -Syu --noconfirm; then
+if sudo pacman -Syu --needed --noconfirm; then
   echo -e "${OK} System updated with Chaotic AUR enabled.${RESET}" | tee -a "$LOG_FILE"
 else
   echo -e "${ERROR} Failed to update system after adding Chaotic AUR.${RESET}" | tee -a "$LOG_FILE"
