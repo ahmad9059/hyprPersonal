@@ -130,6 +130,20 @@ if [ -f "$HYPR_CONF" ]; then
   sed -i 's/SF Pro Display Semibold/Noto Nastaliq Urdu/' "$HYPR_CONF"
 fi
 
+# 3.Set Only Time Locale to Pakistan (Urdu)
+echo -e "${ACTION} Setting ur_PK.UTF-8 locale for time...${RESET}" | tee -a "$LOG_FILE"
+{
+  sudo sed -i 's/^#\s*\(ur_PK.*UTF-8\)/\1/' /etc/locale.gen
+  sudo locale-gen
+  if ! grep -q "^LC_TIME=ur_PK.UTF-8" /etc/locale.conf 2>/dev/null; then
+    echo "LC_TIME=ur_PK.UTF-8" | sudo tee -a /etc/locale.conf >/dev/null
+  fi
+} >>"$LOG_FILE" 2>&1 || {
+  echo -e "${ERROR} Failed to set LC_TIME=ur_PK.UTF-8. See $LOG_FILE for details.${RESET}"
+  exit 1
+}
+echo -e "${OK} LC_TIME=ur_PK.UTF-8 set successfully.${RESET}" | tee -a "$LOG_FILE"
+
 echo "${OK} Personal modifications applied locally.${RESET}"
 
 # ===========================
