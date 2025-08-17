@@ -114,35 +114,27 @@ bash dotfile_installer.sh
 echo "${OK} Dotfiles Installation Completed${RESET}"
 
 # ===========================
-# Apply personal changes
+# Apply personal changes (reverse from GitHub state)
 # ===========================
-echo "${ACTION} Applying personal local modifications...${RESET}"
+echo "${NOTE} Applying personal local modifications...${RESET}"
 
 # 1. Restore kb_options in UserSettings.conf
 USERS_CONF="$HOME/dotfiles/.config/hypr/UserConfigs/UserSettings.conf"
 if [ -f "$USERS_CONF" ]; then
   echo "${ACTION} Updating kb_options in UserSettings.conf..."
-  if sed -i 's/kb_options = $/kb_options = ctrl:nocaps/' "$USERS_CONF"; then
-    echo "${OK} kb_options updated in UserSettings.conf"
-  else
-    echo "${ERROR} Failed to update UserSettings.conf"
-  fi
-else
-  echo "${NOTE} UserSettings.conf not found, skipping."
+  sed -i 's/kb_options = $/kb_options = ctrl:nocaps/' "$USERS_CONF"
+  echo "${OK} kb_options updated in UserSettings.conf"
 fi
+
 # 2. Restore hyprland.conf label block (LC_TIME and font_family)
-HYPR_CONF="$HOME/dotfiles/.config/hypr/hyprlock.conf"
+HYPR_CONF="$HOME/dotfiles/.config/hypr/hyprland.conf"
 if [ -f "$HYPR_CONF" ]; then
   echo "${ACTION} Updating LC_TIME and font_family in hyprlock.conf..."
-  if sed -i 's/LC_TIME=en_US.UTF-8/LC_TIME=ur_PK.UTF-8/' "$HYPR_CONF" &&
-    sed -i 's/SF Pro Display Semibold/Noto Nastaliq Urdu/' "$HYPR_CONF"; then
-    echo "${OK} LC_TIME and font_family updated in hyprlock.conf"
-  else
-    echo "${ERROR} Failed to update hyprlock.conf"
-  fi
-else
-  echo "${NOTE} hyprlock.conf not found, skipping."
+  sed -i 's/LC_TIME=en_US.UTF-8/LC_TIME=ur_PK.UTF-8/' "$HYPR_CONF"
+  sed -i 's/SF Pro Display Semibold/Noto Nastaliq Urdu/' "$HYPR_CONF"
+  echo "${OK} LC_TIME and font_family updated in hyprlock.conf"
 fi
+
 # 3.Set Only Time Locale to Pakistan (Urdu)
 echo -e "${ACTION} Setting ur_PK.UTF-8 locale for time...${RESET}" | tee -a "$LOG_FILE"
 {
