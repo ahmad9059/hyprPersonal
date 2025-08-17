@@ -66,6 +66,7 @@ fi
 # ===========================
 echo "${NOTE} Running Arch-Hyprland/install.sh with preset answers...${RESET}"
 cd "$HOME/Arch-Hyprland"
+
 sed -i '/^[[:space:]]*read HYP$/c\HYP="n"' ~/Arch-Hyprland/install.sh
 sed -i '345i \
 wget -q -O ~/Arch-Hyprland/install-scripts/zsh.sh https://raw.githubusercontent.com/ahmad9059/Scripts/main/zsh.sh\n\
@@ -111,26 +112,6 @@ cd "$HOME/dotfiles"
 chmod +x dotfile_installer.sh
 bash dotfile_installer.sh
 echo "${OK} Dotfiles Installation Completed${RESET}"
-
-# ===========================
-# Apply personal changes (reverse from GitHub state)
-# ===========================
-echo "${NOTE} Applying personal local modifications...${RESET}"
-
-# 1. Restore kb_options in UserSettings.conf
-USERS_CONF="$HOME/dotfiles/.config/hypr/UserConfigs/UserSettings.conf"
-if [ -f "$USERS_CONF" ]; then
-  sed -i 's/kb_options = $/kb_options = ctrl:nocaps/' "$USERS_CONF"
-fi
-
-# 2. Restore hyprland.conf label block (LC_TIME and font_family)
-HYPR_CONF="$HOME/dotfiles/.config/hypr/hyprland.conf"
-if [ -f "$HYPR_CONF" ]; then
-  sed -i 's/LC_TIME=en_US.UTF-8/LC_TIME=ur_PK.UTF-8/' "$HYPR_CONF"
-  sed -i 's/SF Pro Display Semibold/Noto Nastaliq Urdu/' "$HYPR_CONF"
-fi
-
-echo "${OK} Personal modifications applied locally.${RESET}"
 
 # ===========================
 # Ask for Reboot
