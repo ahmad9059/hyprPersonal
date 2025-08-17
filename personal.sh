@@ -109,6 +109,10 @@ fi
 echo "${NOTE} Running dotfiles/install.sh with preset answers...${RESET}"
 cd "$HOME/dotfiles"
 chmod +x dotfile_installer.sh
+# Replace ans1 read
+# sed -i "s/read -rp \"Type 'yes' or 'no' to continue: \" ans1/ans1='yes'/g" "$HOME/dotfiles/dotfile_installer.sh"
+# Replace ans2 read
+# sed -i "s/read -rp \"Type 'yes' or 'no' to continue: \" ans2/ans2='yes'/g" "$HOME/dotfiles/dotfile_installer.sh"
 bash dotfile_installer.sh
 echo "${OK} Dotfiles Installation Completed${RESET}"
 
@@ -154,6 +158,42 @@ echo -e "${ACTION} Setting ur_PK.UTF-8 locale for time...${RESET}" | tee -a "$LO
 echo -e "${OK} LC_TIME=ur_PK.UTF-8 set successfully.${RESET}" | tee -a "$LOG_FILE"
 
 echo "${OK} Personal modifications applied locally.${RESET}"
+
+# ==============================
+# Setup Chaotic AUR Repository
+# ==============================
+echo -e "\n${ACTION} Setting up Chaotic AUR repository...${RESET}" | tee -a "$LOG_FILE"
+# Import Chaotic AUR key
+if sudo pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com &&
+  sudo pacman-key --lsign-key 3056513887B78AEB; then
+  echo -e "${OK} Chaotic AUR key imported successfully.${RESET}" | tee -a "$LOG_FILE"
+else
+  echo -e "${ERROR} Failed to import Chaotic AUR key.${RESET}" | tee -a "$LOG_FILE"
+  exit 1
+fi
+# Install keyring and mirrorlist
+if sudo pacman -U --noconfirm \
+  'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst' \
+  'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'; then
+  echo -e "${OK} Chaotic AUR keyring and mirrorlist installed.${RESET}" | tee -a "$LOG_FILE"
+else
+  echo -e "${ERROR} Failed to install Chaotic AUR keyring/mirrorlist.${RESET}" | tee -a "$LOG_FILE"
+  exit 1
+fi
+# Add chaotic-aur repo if not already present
+if ! grep -q "^\[chaotic-aur\]" /etc/pacman.conf; then
+  echo -e "\n[chaotic-aur]\nInclude = /etc/pacman.d/chaotic-mirrorlist" | sudo tee -a /etc/pacman.conf >/dev/null
+  echo -e "${OK} Chaotic AUR repository added to pacman.conf.${RESET}" | tee -a "$LOG_FILE"
+else
+  echo -e "${NOTE} Chaotic AUR repository already exists in pacman.conf.${RESET}" | tee -a "$LOG_FILE"
+fi
+# Sync and update
+if sudo pacman -Syu --noconfirm; then
+  echo -e "${OK} System updated with Chaotic AUR enabled.${RESET}" | tee -a "$LOG_FILE"
+else
+  echo -e "${ERROR} Failed to update system after adding Chaotic AUR.${RESET}" | tee -a "$LOG_FILE"
+  exit 1
+fi
 
 # ===========================
 # Ask for Reboot
