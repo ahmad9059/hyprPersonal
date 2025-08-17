@@ -157,8 +157,6 @@ echo -e "${ACTION} Setting ur_PK.UTF-8 locale for time...${RESET}" | tee -a "$LO
 }
 echo -e "${OK} LC_TIME=ur_PK.UTF-8 set successfully.${RESET}" | tee -a "$LOG_FILE"
 
-echo "${OK} Personal modifications applied locally.${RESET}"
-
 # ==============================
 # Setup Chaotic AUR Repository
 # ==============================
@@ -194,6 +192,8 @@ else
   echo -e "${ERROR} Failed to update system after adding Chaotic AUR.${RESET}" | tee -a "$LOG_FILE"
   exit 1
 fi
+
+echo -e "\n\n${OK} === Personal modifications applied locally. === ${RESET}"
 
 # ===========================
 # Ask for Reboot
