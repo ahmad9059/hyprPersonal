@@ -242,6 +242,53 @@ fi
 # =========================
 # Git user configuration
 # =========================
+GIT_NAME="ahmad9059"
+GIT_EMAIL="ahmadhassan9059@gmail.com"
+GIT_EDITOR="vim" # or code, nvim, etc.
+
+echo -e "\n${ACTION} Setting up Git global config...${RESET}"
+git config --global user.name "$GIT_NAME"
+git config --global user.email "$GIT_EMAIL"
+git config --global core.editor "$GIT_EDITOR"
+echo -e "${OK} Git global config set.${RESET}"
+
+# =========================
+# GitHub CLI authentication
+# =========================
+TOKEN_FILE="$HOME/.personal_token"
+
+# Case 1: If GH_TOKEN is already exported (from Vercel or shell)
+if [ -n "$GH_TOKEN" ]; then
+  echo -e "${OK} GH_TOKEN found in environment.${RESET}"
+  echo "$GH_TOKEN" >"$TOKEN_FILE"
+  chmod 600 "$TOKEN_FILE"
+
+# Case 2: Use saved token file if it exists
+elif [ -f "$TOKEN_FILE" ]; then
+  echo -e "${NOTE} Using saved personal token from $TOKEN_FILE.${RESET}"
+  GH_TOKEN=$(cat "$TOKEN_FILE")
+
+# Case 3: Token missing → fail
+else
+  echo -e "${ERROR} No GitHub token found. Please export GH_TOKEN first.${RESET}"
+  exit 1
+fi
+
+# Authenticate with GitHub CLI
+echo -e "${ACTION} Authenticating GitHub CLI...${RESET}"
+if echo "$GH_TOKEN" | gh auth login --with-token >/dev/null 2>&1; then
+  echo -e "${OK} GitHub CLI authenticated.${RESET}"
+else
+  echo -e "${ERROR} GitHub CLI authentication failed.${RESET}"
+  exit 1
+fi
+
+# =========================
+# Optional GitHub CLI settings
+# =========================
+gh config set git_protocol https
+gh config set editor "$GIT_EDITOR"
+echo -e "${OK} GitHub CLI config done.${RESET}"
 
 echo -e "\n\n${OK} === Personal modifications applied locally. === ${RESET}"
 

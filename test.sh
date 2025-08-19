@@ -4,10 +4,10 @@ set -e
 # === Variables ===
 RCLONE_CONF="$HOME/.config/rclone/rclone.conf"
 REMOTE_NAME="gdrive"
-CLIENT_ID="877027899050-n5ikr2boe0qmpu43c8kv9o5l0jr98ov7.apps.googleusercontent.com"
-CLIENT_SECRET="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"
+CLIENT_ID=""
+CLIENT_SECRET=""
 
-TOKEN_JSON='{"access_token":"ya29.a0AS3H6NznsegtCn7YFNC2ZQkFqtJx6mWhZckSZb36DKd3RBOwvwyui7qy8yLBPatMv3key6sZZJbN7F2lBAx36JZlCym5jXpqlz0BPYngLdLRb0IxeWJ8u4BX-YMuhwdNrEZwTArT4uQYGsHa2xoPjbILpAcc_omNHvXWlmElaCgYKAeESARESFQHGX2MiikREzO_8Wxu_J-y9eFuo1g0175","token_type":"Bearer","refresh_token":"1//03LX1TgnSMJBVCgYIARAAGAMSNwF-L9IrGWw_GyOltFTwA5tgPWGwVnqcMz8q7ouBeF6fVhoWli7fT26tWnMIKVpho00TrqSfQoA","expiry":"2025-08-16T17:18:25.843951889+05:00","expires_in":3599}'
+TOKEN_JSON=''
 
 # === Ensure directories exist ===
 mkdir -p "$(dirname "$RCLONE_CONF")"
