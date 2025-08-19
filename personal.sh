@@ -65,8 +65,8 @@ trap 'kill $SUDO_KEEP_ALIVE_PID' EXIT
 # Ask passphrase of GPG
 # ===========================
 read -p "Enter GPG passphrase: " GPG_PASS
-# Clear the line after input
-echo -ne "\r\033[K"
+# Move cursor up one line, clear it
+tput cuu1 && tput el
 
 # ===========================
 # Define script directory
