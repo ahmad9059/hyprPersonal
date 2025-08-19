@@ -38,16 +38,6 @@ RCLONE_CONF="$HOME/.config/rclone/rclone.conf"
 REMOTE_NAME="gdrive"
 
 # ===========================
-# Ask passphrase of GPG
-# ===========================
-read -s -p "Enter GPG passphrase: " GPG_PASS
-echo
-
-# ===========================
-# Variables
-# ===========================
-
-# ===========================
 # Log Details
 # ===========================
 mkdir -p "$HOME/installer_log"
@@ -70,6 +60,12 @@ keep_sudo_alive &
 SUDO_KEEP_ALIVE_PID=$!
 
 trap 'kill $SUDO_KEEP_ALIVE_PID' EXIT
+
+# ===========================
+# Ask passphrase of GPG
+# ===========================
+read -p "Enter GPG passphrase: " GPG_PASS
+echo
 
 # ===========================
 # Define script directory
