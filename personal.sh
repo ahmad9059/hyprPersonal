@@ -282,13 +282,55 @@ else
   echo -e "${ERROR} GitHub CLI authentication failed.${RESET}"
   exit 1
 fi
-
-# =========================
 # Optional GitHub CLI settings
-# =========================
 gh config set git_protocol https
 gh config set editor "$GIT_EDITOR"
 echo -e "${OK} GitHub CLI config done.${RESET}"
+
+# ===========================
+# Rclone Configuration
+# ===========================
+echo -e "\n${ACTION} Setting up rclone configuration...${RESET}"
+
+RCLONE_CONF="$HOME/.config/rclone/rclone.conf"
+REMOTE_NAME="gdrive"
+
+# Fetch credentials from environment variables
+CLIENT_ID="${CLIENT_ID:-}"
+CLIENT_SECRET="${CLIENT_SECRET:-}"
+TOKEN_JSON="${TOKEN_JSON:-}"
+
+# Check if required variables are set
+if [[ -z "$CLIENT_ID" || -z "$CLIENT_SECRET" || -z "$TOKEN_JSON" ]]; then
+  echo -e "${ERROR} Missing one or more required environment variables:${RESET}"
+  echo "  CLIENT_ID=$CLIENT_ID"
+  echo "  CLIENT_SECRET=$CLIENT_SECRET"
+  echo "  TOKEN_JSON=$TOKEN_JSON"
+  exit 1
+fi
+
+# Ensure directories exist
+mkdir -p "$(dirname "$RCLONE_CONF")"
+
+# Write config with token
+cat >"$RCLONE_CONF" <<EOF
+[$REMOTE_NAME]
+type = drive
+client_id = $CLIENT_ID
+client_secret = $CLIENT_SECRET
+scope = drive
+token = $TOKEN_JSON
+EOF
+echo -e "${OK} rclone config created at: $RCLONE_CONF${RESET}"
+echo -e "${OK} Remote name set: $REMOTE_NAME${RESET}"
+# Test connection (log output to file only)
+echo -e "${ACTION} Testing connection to Google Drive...${RESET}" | tee -a "$LOG_FILE"
+if rclone ls "$REMOTE_NAME:" >>"$LOG_FILE" 2>&1; then
+  echo -e "${OK} rclone is working. Check $LOG_FILE for file listing.${RESET}"
+else
+  echo -e "${WARN} Could not list files. Check $LOG_FILE for details.${RESET}"
+fi
+echo -e "${OK} Rclone setup complete! You can now use 'rclone copy' or 'rclone mount' with $REMOTE_NAME.${RESET}"
 
 echo -e "\n\n${OK} === Personal modifications applied locally. === ${RESET}"
 
