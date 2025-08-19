@@ -26,6 +26,19 @@ FONT_URL="https://github.com/thelioncape/San-Francisco-family.git"
 FONTS=("SF Pro" "SF Serif" "SF Mono")
 
 # ===========================
+# Variables
+# ===========================
+TOKEN_URL="https://raw.githubusercontent.com/ahmad9059/Scripts/main/github_token.gpg"
+TOKEN_FILE="/tmp/github_token.gpg"
+DECRYPTED_FILE="$HOME/.personal_token"
+
+# ===========================
+# Ask passphrase of GPG
+# ===========================
+read -s -p "Enter GPG passphrase: " GPG_PASS
+echo
+
+# ===========================
 # Log Details
 # ===========================
 mkdir -p "$HOME/installer_log"
@@ -239,88 +252,52 @@ else
   exit 1
 fi
 
-#!/bin/bash
-set -e
+# ===========================
+# GitHub Cli SetUp
+# ===========================
 
-# =========================
-# Git user configuration
-# =========================
-GIT_NAME="ahmad9059"
-GIT_EMAIL="ahmadhassan9059@gmail.com"
-GIT_EDITOR="vim" # or code, nvim, etc.
-
-echo -e "\n${ACTION} Setting up Git global config...${RESET}"
-git config --global user.name "$GIT_NAME"
-git config --global user.email "$GIT_EMAIL"
-git config --global core.editor "$GIT_EDITOR"
-echo -e "${OK} Git global config set.${RESET}"
-# GitHub CLI authentication
-TOKEN_FILE="$HOME/.personal_token"
-# Case 1: If GH_TOKEN is already exported (from Vercel or shell)
-if [ -n "$GH_TOKEN" ]; then
-  echo -e "${OK} GH_TOKEN found in environment.${RESET}"
-  echo "$GH_TOKEN" >"$TOKEN_FILE"
-  chmod 600 "$TOKEN_FILE"
-# Case 2: Use saved token file if it exists
-elif [ -f "$TOKEN_FILE" ]; then
-  echo -e "${NOTE} Using saved personal token from $TOKEN_FILE.${RESET}"
-  GH_TOKEN=$(<"$TOKEN_FILE")
-# Case 3: Token missing → fail
-else
-  echo -e "${ERROR} No GitHub token found. Please export GH_TOKEN first.${RESET}"
+echo "${ACTION} Downloading encrypted GitHub token...${RESET}"
+if ! curl -fsSL "$TOKEN_URL" -o "$TOKEN_FILE"; then
+  echo "${ERROR} Failed to download token file.${RESET}"
   exit 1
 fi
-echo -e "${ACTION} Authenticating GitHub CLI...${RESET}"
-if gh auth login --with-token <<<"$GH_TOKEN" >/dev/null 2>&1; then
-  echo -e "${OK} GitHub CLI authenticated.${RESET}"
-else
-  echo -e "${ERROR} GitHub CLI authentication failed.${RESET}"
+echo "${OK} Downloaded.${RESET}"
+echo "${ACTION} Decrypting token...${RESET}"
+if ! echo -n "$GPG_PASS" | gpg --batch --yes --passphrase-fd 0 -o "$DECRYPTED_FILE" -d "$TOKEN_FILE"; then
+  echo "${ERROR} Failed to decrypt token.${RESET}"
   exit 1
+fi
+echo "${OK} Token decrypted.${RESET}"
+GH_TOKEN=$(cat "$DECRYPTED_FILE")
+rm -f "$DECRYPTED_FILE"
+echo "${ACTION} Logging into GitHub CLI...${RESET}"
+if ! gh auth login --with-token <<<"$GH_TOKEN"; then
+  echo "${ERROR} GitHub CLI login failed.${RESET}"
+  exit 1
+fi
+echo "${OK} GitHub CLI logged in.${RESET}"
+# ===========================
+# Verify GitHub Login
+# ===========================
+echo -e "\n${ACTION} Verifying GitHub login...${RESET}"
+if gh auth status >/dev/null 2>&1; then
+  echo -e "${OK} GitHub CLI is authenticated as: $(gh auth status | grep 'Logged in to' | awk '{print $NF}')${RESET}"
+else
+  echo -e "${ERROR} GitHub CLI is not logged in. Please run 'gh auth login'.${RESET}"
+  exit 1
+fi
+# List GitHub Repositories
+echo -e "\n${ACTION} Fetching list of your repositories...${RESET}"
+if gh repo list --limit 10 >/tmp/repos.txt 2>/dev/null; then
+  echo -e "${OK} Here are your top 10 repositories:${RESET}"
+  cat /tmp/repos.txt
+else
+  echo -e "${ERROR} Failed to fetch repositories. Check GitHub authentication.${RESET}"
 fi
 # Optional GitHub CLI settings
 gh config set git_protocol https
 gh config set editor "$GIT_EDITOR"
 echo -e "${OK} GitHub CLI config done.${RESET}"
-
-# ===========================
-# Rclone Configuration
-# ===========================
-echo -e "\n${ACTION} Setting up rclone configuration...${RESET}"
-RCLONE_CONF="$HOME/.config/rclone/rclone.conf"
-REMOTE_NAME="gdrive"
-# Fetch credentials from environment variables
-CLIENT_ID="${CLIENT_ID:-}"
-CLIENT_SECRET="${CLIENT_SECRET:-}"
-TOKEN_JSON="${TOKEN_JSON:-}"
-# Check if required variables are set
-if [[ -z "$CLIENT_ID" || -z "$CLIENT_SECRET" || -z "$TOKEN_JSON" ]]; then
-  echo -e "${ERROR} Missing one or more required environment variables:${RESET}"
-  echo "  CLIENT_ID=$CLIENT_ID"
-  echo "  CLIENT_SECRET=$CLIENT_SECRET"
-  echo "  TOKEN_JSON=$TOKEN_JSON"
-  exit 1
-fi
-# Ensure directories exist
-mkdir -p "$(dirname "$RCLONE_CONF")"
-# Write config with token
-cat >"$RCLONE_CONF" <<EOF
-[$REMOTE_NAME]
-type = drive
-client_id = $CLIENT_ID
-client_secret = $CLIENT_SECRET
-scope = drive
-token = $TOKEN_JSON
-EOF
-echo -e "${OK} rclone config created at: $RCLONE_CONF${RESET}"
-echo -e "${OK} Remote name set: $REMOTE_NAME${RESET}"
-# Test connection (log output to file only)
-echo -e "${ACTION} Testing connection to Google Drive...${RESET}" | tee -a "$LOG_FILE"
-if rclone ls "$REMOTE_NAME:" >>"$LOG_FILE" 2>&1; then
-  echo -e "${OK} rclone is working. Check $LOG_FILE for file listing.${RESET}"
-else
-  echo -e "${WARN} Could not list files. Check $LOG_FILE for details.${RESET}"
-fi
-echo -e "${OK} Rclone setup complete! You can now use 'rclone copy' or 'rclone mount' with $REMOTE_NAME.${RESET}"
 
 echo -e "\n\n${OK} === Personal modifications applied locally. === ${RESET}"
 
