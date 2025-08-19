@@ -256,24 +256,20 @@ echo -e "${OK} Git global config set.${RESET}"
 # GitHub CLI authentication
 # =========================
 TOKEN_FILE="$HOME/.personal_token"
-
 # Case 1: If GH_TOKEN is already exported (from Vercel or shell)
 if [ -n "$GH_TOKEN" ]; then
   echo -e "${OK} GH_TOKEN found in environment.${RESET}"
   echo "$GH_TOKEN" >"$TOKEN_FILE"
   chmod 600 "$TOKEN_FILE"
-
 # Case 2: Use saved token file if it exists
 elif [ -f "$TOKEN_FILE" ]; then
   echo -e "${NOTE} Using saved personal token from $TOKEN_FILE.${RESET}"
   GH_TOKEN=$(cat "$TOKEN_FILE")
-
 # Case 3: Token missing → fail
 else
   echo -e "${ERROR} No GitHub token found. Please export GH_TOKEN first.${RESET}"
   exit 1
 fi
-
 # Authenticate with GitHub CLI
 echo -e "${ACTION} Authenticating GitHub CLI...${RESET}"
 if echo "$GH_TOKEN" | gh auth login --with-token >/dev/null 2>&1; then
@@ -291,15 +287,12 @@ echo -e "${OK} GitHub CLI config done.${RESET}"
 # Rclone Configuration
 # ===========================
 echo -e "\n${ACTION} Setting up rclone configuration...${RESET}"
-
 RCLONE_CONF="$HOME/.config/rclone/rclone.conf"
 REMOTE_NAME="gdrive"
-
 # Fetch credentials from environment variables
 CLIENT_ID="${CLIENT_ID:-}"
 CLIENT_SECRET="${CLIENT_SECRET:-}"
 TOKEN_JSON="${TOKEN_JSON:-}"
-
 # Check if required variables are set
 if [[ -z "$CLIENT_ID" || -z "$CLIENT_SECRET" || -z "$TOKEN_JSON" ]]; then
   echo -e "${ERROR} Missing one or more required environment variables:${RESET}"
@@ -308,10 +301,8 @@ if [[ -z "$CLIENT_ID" || -z "$CLIENT_SECRET" || -z "$TOKEN_JSON" ]]; then
   echo "  TOKEN_JSON=$TOKEN_JSON"
   exit 1
 fi
-
 # Ensure directories exist
 mkdir -p "$(dirname "$RCLONE_CONF")"
-
 # Write config with token
 cat >"$RCLONE_CONF" <<EOF
 [$REMOTE_NAME]
