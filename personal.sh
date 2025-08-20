@@ -321,19 +321,16 @@ echo -e "${OK} GitHub CLI config done.${RESET}"
 # Temp directory
 TMP_DIR="/tmp" # reuse /tmp
 mkdir -p "$TMP_DIR" is optional since /tmp always exists
-
 download_and_decrypt() {
   local url="$1"
   local outfile="$2"
   local name="$3"
-
   echo "${ACTION} Downloading $name..."
   if ! curl -fsSL "$url" -o "$outfile.gpg" >>"$LOG_FILE" 2>&1; then
     echo "${ERROR} Failed to download $name. See log: $LOG_FILE"
     exit 1
   fi
   echo "${OK} $name downloaded."
-
   echo "${ACTION} Decrypting $name..."
   if ! echo -n "$GPG_PASS" | gpg --batch --yes --passphrase-fd 0 \
     -o "$outfile" -d "$outfile.gpg" >>"$LOG_FILE" 2>&1; then
@@ -342,20 +339,16 @@ download_and_decrypt() {
   fi
   echo "${OK} $name decrypted."
 }
-
 # Download & decrypt all secrets
 download_and_decrypt "$CLIENT_ID_URL" "$TMP_DIR/client_id" "Client ID"
 download_and_decrypt "$CLIENT_SECRET_URL" "$TMP_DIR/client_secret" "Client Secret"
 download_and_decrypt "$TOKEN_JSON_URL" "$TMP_DIR/token_json" "Token JSON"
-
 CLIENT_ID=$(cat "$TMP_DIR/client_id")
 CLIENT_SECRET=$(cat "$TMP_DIR/client_secret")
 TOKEN_JSON=$(cat "$TMP_DIR/token_json")
-
 # Ensure config directory exists
 mkdir -p "$(dirname "$RCLONE_CONF")"
 mkdir -p "$HOME/gdrive"
-
 # Write rclone config
 echo "${ACTION} Writing rclone config..."
 cat >"$RCLONE_CONF" <<EOF
@@ -368,7 +361,6 @@ token = $TOKEN_JSON
 EOF
 echo "${OK} rclone config created at: $RCLONE_CONF"
 echo "${OK} Remote name: $REMOTE_NAME"
-
 # Test connection
 echo "${ACTION} Testing list of files in Google Drive..."
 if rclone ls "$REMOTE_NAME:" >>"$LOG_FILE" 2>&1 | head -20; then
@@ -376,7 +368,6 @@ if rclone ls "$REMOTE_NAME:" >>"$LOG_FILE" 2>&1 | head -20; then
 else
   echo "${WARN} No files yet or connection issue. See log: $LOG_FILE"
 fi
-
 echo "${OK} Setup complete! You can now use 'rclone copy' or 'rclone mount' with $REMOTE_NAME"
 echo "${NOTE} Detailed logs are saved at: $LOG_FILE"
 
