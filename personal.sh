@@ -319,8 +319,8 @@ echo -e "${OK} GitHub CLI config done.${RESET}"
 # ===========================
 
 # Temp directory
-TMP_DIR="/tmp" # reuse /tmp
-mkdir -p "$TMP_DIR" is optional since /tmp always exists
+TMP_DIR="/tmp"
+mkdir -p "$TMP_DIR"
 download_and_decrypt() {
   local url="$1"
   local outfile="$2"
