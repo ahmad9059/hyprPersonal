@@ -273,7 +273,6 @@ fi
 # ===========================
 # GitHub Cli SetUp
 # ===========================
-
 echo "${ACTION} Downloading encrypted GitHub token...${RESET}"
 if ! curl -fsSL "$TOKEN_URL" -o "$TOKEN_FILE"; then
   echo "${ERROR} Failed to download token file.${RESET}"
@@ -294,9 +293,7 @@ if ! gh auth login --with-token <<<"$GH_TOKEN"; then
   exit 1
 fi
 echo "${OK} GitHub CLI logged in.${RESET}"
-# ===========================
 # Verify GitHub Login
-# ===========================
 echo -e "\n${ACTION} Verifying GitHub login...${RESET}"
 if gh auth status >/dev/null 2>&1; then
   echo -e "${OK} GitHub CLI is authenticated as: $(gh auth status | grep 'Logged in to' | awk '{print $NF}')${RESET}"
@@ -313,6 +310,9 @@ else
   echo -e "${ERROR} Failed to fetch repositories. Check GitHub authentication.${RESET}"
 fi
 # Git Global Configuration
+
+# Ensure we're in a valid directory
+cd "${HOME}" || exit 1
 echo "${ACTION} Setting up Git global configuration...${RESET}"
 # Set Git username
 if ! git config --global user.name "$GIT_USERNAME"; then
