@@ -139,9 +139,9 @@ echo "${NOTE} Running dotfiles/install.sh with preset answers...${RESET}"
 cd "$HOME/dotfiles"
 chmod +x dotfile_installer.sh
 # Replace ans1 read
-# sed -i "s/read -rp \"Type 'yes' or 'no' to continue: \" ans1/ans1='yes'/g" "$HOME/dotfiles/dotfile_installer.sh"
+sed -i "s/read -rp \"Type 'yes' or 'no' to continue: \" ans1/ans1='no'/g" "$HOME/dotfiles/dotfile_installer.sh"
 # Replace ans2 read
-# sed -i "s/read -rp \"Type 'yes' or 'no' to continue: \" ans2/ans2='yes'/g" "$HOME/dotfiles/dotfile_installer.sh"
+sed -i "s/read -rp \"Type 'yes' or 'no' to continue: \" ans2/ans2='no'/g" "$HOME/dotfiles/dotfile_installer.sh"
 bash dotfile_installer.sh
 echo "${OK} Dotfiles Installation Completed${RESET}"
 
