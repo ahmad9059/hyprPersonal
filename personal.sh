@@ -145,7 +145,7 @@ fi
 # ===========================
 echo "${NOTE} Running dotfiles/install.sh with preset answers...${RESET}"
 cd "$HOME/dotfiles"
-chmod +x dotfile_installer.sh
+chmod +x dotsSetup.sh
 # Replace ans1 read
 # sed -i "s/read -rp \"Type 'yes' or 'no' to continue: \" ans1/ans1='no'/g" "$HOME/dotfiles/dotfile_installer.sh"
 sed -i "s/read -rp \"Type 'yes' or 'no' to continue: \" ans1/ans1='$REPLACEMENT'/g" "$HOME/dotfiles/dotfile_installer.sh"
