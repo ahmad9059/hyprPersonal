@@ -36,6 +36,9 @@ CLIENT_SECRET_URL="https://raw.githubusercontent.com/ahmad9059/Scripts/main/clie
 TOKEN_JSON_URL="https://raw.githubusercontent.com/ahmad9059/Scripts/main/token-json.gpg"
 RCLONE_CONF="$HOME/.config/rclone/rclone.conf"
 REMOTE_NAME="gdrive"
+GIT_USERNAME="ahmad9059"
+GIT_EMAIL="ahmadhassan9059@gmail.com"
+GIT_EDITOR="vim"
 
 # ===========================
 # Log Details
@@ -309,9 +312,27 @@ if gh repo list --limit 10 >/tmp/repos.txt 2>/dev/null; then
 else
   echo -e "${ERROR} Failed to fetch repositories. Check GitHub authentication.${RESET}"
 fi
-# Optional GitHub CLI settings
-gh config set git_protocol https
-gh config set editor "$GIT_EDITOR"
+# Git Global Configuration
+echo "${ACTION} Setting up Git global configuration...${RESET}"
+# Set Git username
+if ! git config --global user.name "$GIT_USERNAME"; then
+  echo "${ERROR} Failed to set Git username.${RESET}"
+  exit 1
+fi
+echo "${OK} Git username set to '$GIT_USERNAME'.${RESET}"
+# Set Git email
+if ! git config --global user.email "$GIT_EMAIL"; then
+  echo "${ERROR} Failed to set Git email.${RESET}"
+  exit 1
+fi
+echo "${OK} Git email set to '$GIT_EMAIL'.${RESET}"
+# Set default editor
+if ! git config --global core.editor "$GIT_EDITOR"; then
+  echo "${ERROR} Failed to set Git editor.${RESET}"
+  exit 1
+fi
+echo "${OK} Git editor set to '$GIT_EDITOR'.${RESET}"
+
 echo -e "${OK} GitHub CLI config done.${RESET}"
 
 # ===========================
