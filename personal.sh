@@ -124,6 +124,7 @@ echo -e "${MAGENTA} │││ │ │ ├┤ ││  ├┤ └─┐└─┐  
 echo -e "${MAGENTA}─┴┘└─┘ ┴ └  ┴┴─┘└─┘└─┘└─┘  ┴┘└┘└─┘ ┴ ┴ ┴┴─┘┴─┘└─┘┴└─${RESET}"
 echo -e "${CYAN}✻─────────────────────ahmad9059──────────────────────✻${RESET}"
 echo -e "\n"
+echo "👌 ${OK} 🇵🇰 ${MAGENTA}HyprFlux..${RESET} ${SKY_BLUE}lets continue with the dotfiles Installation...${RESET}" | tee -a "$LOG"
 
 # ===========================
 # Clone HyprFlux repo
